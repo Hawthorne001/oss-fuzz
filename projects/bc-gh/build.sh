@@ -1,4 +1,5 @@
-# Copyright 2019 Evan Miller
+#!/bin/bash -eu
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,19 +15,7 @@
 #
 ################################################################################
 
-#!/bin/bash -eu
+./configure -Z
+make -j$(nproc) all
 
-if [ -f ./autogen.sh ]; then
-  ./autogen.sh
-else
-  ./bootstrap
-fi
-./configure --enable-static
-make clean
-
-make
-
-zip $OUT/fuzz_xls_seed_corpus.zip test/files/*.xls fuzz/corpus/*.xls
-
-make fuzz_xls
-cp fuzz_xls $OUT/fuzz_xls
+cp bin/*_fuzzer_* $OUT/

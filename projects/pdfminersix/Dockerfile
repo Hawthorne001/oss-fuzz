@@ -1,5 +1,4 @@
-#!/bin/bash -eu
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,16 +13,12 @@
 # limitations under the License.
 #
 ################################################################################
-./configure --debug --no-regex --no-pcre2
-make all
 
-pushd fuzzer/
-make
-cp Fuzz_http $OUT/Fuzz_http
-cp Fuzz_json $OUT/Fuzz_json
-popd
+FROM gcr.io/oss-fuzz-base/base-builder-python
+RUN pip3 install --upgrade pip
+RUN mkdir $SRC/corpus
+RUN git clone --depth 1 https://github.com/pdfminer/pdfminer.six.git pdfminer.six \
+        && cp pdfminer.six/fuzzing/build.sh $SRC/ \
+	&& cp pdfminer.six/samples/simple* $SRC/corpus
+WORKDIR $SRC/pdfminer.six
 
-pushd $SRC/oss-fuzz-bloat/nginx-unit/
-cp Fuzz_http_seed_corpus.zip $OUT/Fuzz_http_seed_corpus.zip
-cp Fuzz_json_seed_corpus.zip $OUT/Fuzz_json_seed_corpus.zip
-popd
